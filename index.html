@@ -1,0 +1,646 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<meta name="theme-color" content="#1687e8">
+<link rel="manifest" href="/manifest.json">
+<title>Лебато Броза</title>
+<style>
+:root{
+  --blue:#1687e8; --bg:#f4f7fb; --card:#fff; --text:#17202a; --muted:#738091;
+  --line:#e4e9ef; --soft:#eef6ff; --danger:#e74c3c; --dark:#0f1419;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text)}
+button,input,textarea{font:inherit}button{cursor:pointer}
+.app{max-width:1100px;margin:auto;min-height:100dvh;display:grid;grid-template-columns:230px 1fr 270px;gap:14px}
+.side,.right{padding:18px 10px}
+.brand{font-weight:800;font-size:22px;color:var(--blue);padding:12px;display:flex;align-items:center;gap:10px}
+.brand-logo{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#1687e8,#6c5ce7);display:grid;place-items:center;color:#fff;font-size:18px;font-weight:900}
+.nav button{width:100%;border:0;background:transparent;text-align:left;padding:13px 14px;border-radius:13px;margin:2px 0;color:var(--text)}
+.nav button.active,.nav button:hover{background:var(--soft);color:var(--blue)}
+.main{min-width:0;background:var(--bg);border-left:1px solid var(--line);border-right:1px solid var(--line)}
+.top{position:sticky;top:0;z-index:5;background:#ffffffee;backdrop-filter:blur(10px);padding:14px 18px;border-bottom:1px solid var(--line)}
+.top h1{margin:0;font-size:20px}.top small{color:var(--muted)}
+.view{padding:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:15px;margin-bottom:12px}
+.composer textarea{width:100%;border:0;outline:0;resize:none;min-height:72px;background:transparent}
+.row{display:flex;align-items:center;gap:10px}
+.avatar{width:42px;height:42px;border-radius:50%;object-fit:cover;background:#ddd}
+.grow{flex:1}.muted{color:var(--muted)}
+.btn{border:0;border-radius:12px;padding:9px 14px;background:var(--blue);color:#fff;font-weight:600}
+.btn.secondary{background:var(--soft);color:var(--blue)}.btn.danger{background:#fff0ee;color:var(--danger)}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--text)}
+.post-text{white-space:pre-wrap;line-height:1.45;margin:12px 0}
+.post-img,.post-video{width:100%;max-height:520px;object-fit:cover;border-radius:13px;margin-top:8px;background:#000}
+.post-sticker{font-size:64px;text-align:center;margin:10px 0}
+.actions{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.actions button{border:0;background:transparent;color:var(--muted);padding:8px 10px;border-radius:10px}
+.actions button:hover{background:var(--soft);color:var(--blue)}
+.tabs{display:flex;gap:6px;overflow:auto;margin-bottom:12px}
+.tabs button{white-space:nowrap;border:0;background:transparent;padding:9px 12px;border-radius:12px}
+.tabs button.active{background:var(--soft);color:var(--blue)}
+.search{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:14px;outline:0;background:#fff}
+.list-item{display:flex;align-items:center;gap:12px;padding:10px 2px;border-bottom:1px solid var(--line)}
+.list-item:last-child{border-bottom:0}
+.empty{text-align:center;padding:50px 20px;color:var(--muted)}
+.modal{position:fixed;inset:0;background:#0008;display:grid;place-items:center;z-index:30;padding:16px}
+.modalbox{width:min(440px,100%);background:#fff;border-radius:20px;padding:20px;max-height:90dvh;overflow:auto}
+.modal input,.modal textarea{width:100%;border:1px solid var(--line);padding:11px;border-radius:11px;margin:5px 0 10px}
+.hidden{display:none!important}
+.bottom{display:none}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#20252b;color:#fff;padding:11px 15px;border-radius:12px;z-index:40;max-width:90%}
+.tag{color:var(--blue)}
+.admin{border-left:3px solid var(--blue);padding-left:10px}
+
+/* ===== TikTok-style profile ===== */
+.tt-profile{background:var(--card);border-radius:0 0 18px 18px;overflow:hidden;margin:-14px -14px 14px;border:1px solid var(--line);border-top:0}
+.tt-cover{height:160px;background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);position:relative;overflow:hidden}
+.tt-cover img{width:100%;height:100%;object-fit:cover}
+.tt-cover-edit{position:absolute;right:12px;bottom:12px;background:#0008;color:#fff;border:0;border-radius:20px;padding:6px 12px;font-size:13px}
+.tt-body{padding:0 16px 18px;position:relative}
+.tt-avatar-wrap{margin-top:-48px;display:flex;justify-content:space-between;align-items:flex-end}
+.tt-avatar{width:96px;height:96px;border-radius:50%;border:4px solid #fff;object-fit:cover;background:#ddd;box-shadow:0 4px 12px #0002}
+.tt-actions-top{display:flex;gap:8px;margin-bottom:8px}
+.tt-name{font-size:22px;font-weight:800;margin:12px 0 2px}
+.tt-handle{color:var(--muted);font-size:14px;margin-bottom:10px}
+.tt-stats{display:flex;gap:22px;margin:14px 0}
+.tt-stat b{display:block;font-size:17px}
+.tt-stat span{font-size:13px;color:var(--muted)}
+.tt-bio{font-size:14px;line-height:1.4;white-space:pre-wrap;margin:8px 0 4px}
+.tt-follow-btn{width:100%;margin-top:10px;padding:11px;border-radius:10px;font-weight:700}
+
+/* composer extras */
+.media-preview{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.media-preview img,.media-preview video{width:90px;height:90px;object-fit:cover;border-radius:10px;border:1px solid var(--line)}
+.media-preview .rm{position:absolute;top:-6px;right:-6px;background:#e74c3c;color:#fff;border:0;border-radius:50%;width:22px;height:22px;font-size:12px}
+.sticker-bar{display:flex;gap:8px;overflow-x:auto;padding:8px 0;margin:6px 0}
+.sticker-bar button{font-size:28px;border:1px solid var(--line);background:#fff;border-radius:12px;padding:6px 10px;min-width:52px}
+.sticker-bar button.active{border-color:var(--blue);background:var(--soft)}
+.file-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:10px;border:1px solid var(--line);background:#fff;color:var(--text);font-size:13px}
+
+
+/* ===== LB8 additions ===== */
+:root{--accent:var(--blue);--accent-soft:var(--soft)}
+body,.card,.top,.side,.right,.main,.bottom,.modalbox,input,textarea,button{transition:background-color .22s ease,color .22s ease,border-color .22s ease,box-shadow .22s ease,transform .22s ease,opacity .22s ease}
+.card{animation:lbFade .28s ease both}.nav button:hover,.btn:hover,.actions button:hover,.tabs button:hover{transform:translateY(-1px)}
+@keyframes lbFade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.verify{display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;border-radius:50%;color:#fff;font-size:12px;font-weight:900;margin-left:5px;vertical-align:middle;box-shadow:0 1px 3px #0003}
+.verify.red{background:#e53935}.verify.blue{background:#1687e8}
+.username{color:var(--muted);font-size:13px}.community-card{cursor:pointer}.sticker-editor-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.sticker-pick{font-size:30px;padding:10px;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+.color-row{display:flex;gap:8px;flex-wrap:wrap}.color-dot{width:32px;height:32px;border-radius:50%;border:2px solid var(--line);cursor:pointer}.comment-list{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}.comment{padding:8px 0;border-bottom:1px solid var(--line)}
+@media(max-width:800px){
+  .app{display:block}
+  .side,.right{display:none}
+  .main{border:0}
+  .bottom{display:grid;position:fixed;left:0;right:0;bottom:0;height:68px;padding-bottom:env(safe-area-inset-bottom);background:#fffffff5;backdrop-filter:blur(12px);border-top:1px solid var(--line);grid-template-columns:repeat(5,1fr);z-index:10}
+  .bottom button{border:0;background:transparent;color:var(--muted);font-size:11px}
+  .bottom button.active{color:var(--blue)}
+  .bottom span{display:block;font-size:21px;margin-bottom:2px}
+  .view{padding:10px 10px 80px}
+  .top{padding:12px 14px}
+  .card{border-radius:15px}
+  .tt-profile{margin:-10px -10px 12px}
+  .tt-cover{height:140px}
+  .tt-avatar{width:84px;height:84px}
+}
+</style>
+</head>
+<body>
+<div id="serverConnect" class="modal hidden">
+  <div class="modalbox">
+    <h2>Подключение к серверу</h2>
+    <p class="muted">Приложение сначала попробует найти сервер автоматически.</p>
+    <input id="serverUrl" placeholder="http://192.168.1.100:3000" inputmode="url" autocomplete="url">
+    <button id="serverAuto" class="btn" style="width:100%;margin-bottom:8px">🔎 Автоматически найти сервер</button>
+    <button id="serverConnectGo" class="btn secondary" style="width:100%">Подключить по адресу</button>
+    <p id="serverErr" class="muted"></p>
+  </div>
+</div>
+
+<div id="auth" class="modal">
+  <div class="modalbox">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+      <div class="brand-logo">ЛБ</div>
+      <div>
+        <h2 style="margin:0">Лебато Броза</h2>
+        <p class="muted" style="margin:0">Соцсеть языка и сообщества</p>
+      </div>
+    </div>
+    <div class="tabs">
+      <button id="tabLogin" class="active">Войти</button>
+      <button id="tabReg">Регистрация</button>
+    </div>
+    <input id="authName" placeholder="Имя">
+    <input id="authPass" type="password" placeholder="Пароль">
+    <button id="authGo" class="btn" style="width:100%">Войти</button>
+    <p id="authErr" class="muted"></p>
+  </div>
+</div>
+
+<div class="app">
+  <aside class="side">
+    <div class="brand"><div class="brand-logo">ЛБ</div> Лебато Броза</div>
+    <nav class="nav">
+      <button data-v="feed" class="active">🏠 Лента</button>
+      <button data-v="communities">👥 Сообщества</button>
+      <button data-v="dictionary">📖 Словарь</button>
+      <button data-v="notifications">🔔 Уведомления</button>
+      <button data-v="profile">👤 Профиль</button>
+      <button data-v="settings">⚙️ Настройки</button>
+    </nav>
+  </aside>
+
+  <main class="main">
+    <header class="top">
+      <h1 id="title">Лента</h1>
+      <small id="sub">Все публикации</small>
+    </header>
+
+    <section id="view-feed" class="view">
+      <div class="tabs">
+        <button data-feed="all" class="active">Все</button>
+        <button data-feed="following">Подписки</button>
+        <button data-feed="popular">Популярное</button>
+      </div>
+      <div class="card composer">
+        <textarea id="postText" maxlength="5000" placeholder="Что нового в Лебато Броза?"></textarea>
+        <div id="mediaPreview" class="media-preview"></div>
+        <div class="sticker-bar" id="stickerBar">
+          <button data-s="🔥">🔥</button>
+          <button data-s="😂">😂</button>
+          <button data-s="❤️">❤️</button>
+          <button data-s="👀">👀</button>
+          <button data-s="💀">💀</button>
+          <button data-s="✨">✨</button>
+          <button data-s="🐸">🐸</button>
+          <button data-s="💯">💯</button>
+          <button data-s="🚀">🚀</button>
+          <button data-s="👑">👑</button>
+        </div>
+        <div class="row" style="flex-wrap:wrap;gap:8px">
+          <label class="file-btn">📷 Фото<input type="file" id="imgInput" accept="image/*" multiple hidden></label>
+          <label class="file-btn">🎬 Видео<input type="file" id="vidInput" accept="video/*" hidden></label>
+          <span class="grow"></span>
+          <button id="postGo" class="btn">Опубликовать</button>
+        </div>
+      </div>
+      <div id="feed"></div>
+    </section>
+
+    <section id="view-communities" class="view hidden">
+      <div class="card"><div class="row"><div class="grow"><b>Сообщества</b><div class="muted">Находи людей по интересам</div></div><button class="btn" onclick="createCommunity()">Создать</button></div></div>
+      <div id="communities"></div>
+    </section>
+
+    <section id="view-dictionary" class="view hidden">
+      <div class="card">
+        <div class="row">
+          <div class="grow"><b>Словарь Лебато Броза</b><div class="muted">Только подтверждённые слова</div></div>
+          <button id="suggestBtn" class="btn secondary">Предложить слово</button>
+        </div>
+      </div>
+      <div id="dict"></div>
+    </section>
+
+    <section id="view-notifications" class="view hidden">
+      <div id="notifications"></div>
+    </section>
+
+    <section id="view-profile" class="view hidden">
+      <div id="profile"></div>
+    </section>
+
+    <section id="view-settings" class="view hidden">
+      <div class="card">
+        <h3>Настройки</h3>
+        <button id="editProfile" class="btn secondary">Изменить профиль</button>
+        <button class="btn secondary" onclick="openStickerEditor()">🎨 Редактор стикеров</button>
+        <button class="btn secondary" onclick="openSupport()">🛟 Центр поддержки</button>
+        <button class="btn secondary" onclick="openThemeSettings()">🎨 Тема и цвета</button>
+        <button id="logout" class="btn danger" style="margin-left:8px">Выйти</button>
+      </div>
+      <div id="adminPanel"></div>
+    </section>
+  </main>
+
+  <aside class="right">
+    <div class="card"><b>Слово дня</b><h2 id="wordDay">—</h2><div id="wordNote" class="muted"></div></div>
+    <div class="card"><b>Сообщество</b><p class="muted">Пишите посты, предлагайте слова и подписывайтесь на авторов.</p></div>
+  </aside>
+</div>
+
+<nav class="bottom">
+  <button data-v="feed" class="active"><span>🏠</span>Лента</button>
+  <button data-v="communities"><span>👥</span>Сообщества</button>
+  <button id="mobileCreate"><span>➕</span>Создать</button>
+  <button data-v="notifications"><span>🔔</span>Уведомления</button>
+  <button data-v="profile"><span>👤</span>Профиль</button>
+</nav>
+
+<div id="modalRoot"></div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+let token = localStorage.getItem('lb7-token') || localStorage.getItem('lb6-token');
+let me = null, feedType = 'all', authMode = 'login';
+let pendingImages = [], pendingVideos = [], selectedSticker = null;
+const $ = id => document.getElementById(id);
+const esc = s => { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; };
+
+function normalizeServerUrl(v){ v=String(v||'').trim(); if(!v)return ''; if(!/^https?:\/\//i.test(v))v='http://'+v; return v.replace(/\/$/,''); }
+const initialServer = normalizeServerUrl(new URLSearchParams(location.search).get('server'));
+const savedServer = normalizeServerUrl(localStorage.getItem('lb7-server') || localStorage.getItem('lb6-server'));
+const sameOrigin = (location.protocol==='http:'||location.protocol==='https:') ? location.origin : '';
+let API_BASE = initialServer || savedServer || sameOrigin;
+const AUTO_SERVERS = [...new Set([API_BASE,'http://lebatobroza.local:3000','http://localhost:3000','http://127.0.0.1:3000'].filter(Boolean))];
+
+function apiUrl(url){ return API_BASE + url; }
+async function api(url, opt={}){
+  if(!API_BASE) throw Error('Сервер не найден.');
+  opt.headers = { ...(opt.headers||{}), ...(token?{Authorization:'Bearer '+token}:{}), 'Content-Type':'application/json' };
+  let r;
+  try { r = await fetch(apiUrl(url), opt); }
+  catch(e){ throw Error('Не удалось подключиться к серверу.'); }
+  const d = await r.json().catch(()=>({}));
+  if(!r.ok) throw Error(d.error || 'Ошибка сервера');
+  return d;
+}
+function toast(t){ const x=document.createElement('div'); x.className='toast'; x.textContent=t; document.body.append(x); setTimeout(()=>x.remove(),2400); }
+
+function nav(v){
+  document.querySelectorAll('[data-v]').forEach(b => b.classList.toggle('active', b.dataset.v===v));
+  ['feed','communities','dictionary','notifications','profile','settings'].forEach(x => $('view-'+x)?.classList.toggle('hidden', x!==v));
+  const names = { feed:['Лента','Все публикации'], communities:['Сообщества','Люди и интересы'], dictionary:['Словарь','Язык сообщества'], notifications:['Уведомления','Активность'], profile:['Профиль',''], settings:['Настройки',''] };
+  $('title').textContent = names[v][0];
+  $('sub').textContent = names[v][1];
+  if(v==='feed') loadFeed();
+  if(v==='dictionary') loadDict();
+  if(v==='notifications') loadNotifications();
+  if(v==='profile') loadProfile(me.id);
+  if(v==='communities') loadCommunities();
+  if(v==='settings') loadAdmin();
+}
+
+let socket = null;
+async function loadMe(){
+  me = await api('/api/me');
+  $('auth').classList.add('hidden');
+  if(window.io && token){
+    try { socket = io(API_BASE); socket.on('connect', () => socket.emit('auth', token)); } catch{}
+  }
+}
+
+function verifyBadge(v){ return v==='red'?'<span class="verify red" title="Подтверждённый Арут">✓</span>':v==='blue'?'<span class="verify blue" title="Подтверждённый хэлодэнил">✓</span>':''; }
+
+function postCard(p){
+  if(p.blocked) return '';
+  const media = [
+    ...(p.images||[]).map(x => `<img class="post-img" src="${esc(x)}" loading="lazy">`),
+    ...(p.videos||[]).map(x => `<video class="post-video" src="${esc(x)}" controls playsinline></video>`)
+  ].join('');
+  const sticker = p.sticker ? `<div class="post-sticker">${esc(p.sticker)}</div>` : '';
+  return `<article class="card">
+    <div class="row">
+      <img class="avatar" src="${esc(p.avatar)}">
+      <div class="grow">
+        <b onclick="loadProfile('${p.authorId}');nav('profile')" style="cursor:pointer">${esc(p.author)}${verifyBadge(p.verification)}</b><div class="username">@${esc(p.username||'')}</div>
+        <div class="muted">${new Date(p.createdAt).toLocaleString()}</div>
+      </div>
+      <button class="btn secondary" onclick="report('post','${p.id}')">⚑</button>
+    </div>
+    ${p.text ? `<div class="post-text">${esc(p.text).replace(/(^|\\s)(#[A-Za-zА-Яа-яЁё0-9_]+)/g,'$1<span class="tag">$2</span>')}</div>` : ''}
+    ${sticker}${media}
+    <div class="actions">
+      <button onclick="likePost('${p.id}')">${p.liked?'❤️':'🤍'} ${p.likes||0}</button>
+      <button onclick="commentPost('${p.id}')">💬 ${p.comments?.length||0}</button>
+      <button onclick="repost('${p.id}')">🔁 ${p.reposts||0}</button>
+      ${p.authorId===me.id ? `<button onclick="deletePost('${p.id}')">🗑️</button>` : ''}
+    </div>
+  </article>`;
+}
+
+async function loadFeed(){
+  try {
+    const data = await api('/api/feed?type='+feedType);
+    $('feed').innerHTML = data.length ? data.map(postCard).join('') : '<div class="empty">Постов пока нет.<br>Опубликуй первый!</div>';
+  } catch(e){ toast(e.message); }
+}
+
+function renderMediaPreview(){
+  const box = $('mediaPreview');
+  box.innerHTML = '';
+  pendingImages.forEach((src,i) => {
+    const w = document.createElement('div'); w.style.position='relative';
+    w.innerHTML = `<img src="${src}"><button class="rm" data-i="${i}">×</button>`;
+    w.querySelector('button').onclick = () => { pendingImages.splice(i,1); renderMediaPreview(); };
+    box.append(w);
+  });
+  pendingVideos.forEach((src,i) => {
+    const w = document.createElement('div'); w.style.position='relative';
+    w.innerHTML = `<video src="${src}" muted></video><button class="rm" data-v="${i}">×</button>`;
+    w.querySelector('button').onclick = () => { pendingVideos.splice(i,1); renderMediaPreview(); };
+    box.append(w);
+  });
+}
+
+function fileToDataURL(file, maxSizeMB=6){
+  return new Promise((resolve,reject) => {
+    if(file.size > maxSizeMB*1024*1024) return reject(Error(`Файл слишком большой (макс. ${maxSizeMB} МБ)`));
+    const r = new FileReader();
+    r.onload = () => resolve(r.result);
+    r.onerror = () => reject(Error('Не удалось прочитать файл'));
+    r.readAsDataURL(file);
+  });
+}
+
+$('imgInput').onchange = async e => {
+  for(const f of [...e.target.files].slice(0,4)){
+    try { pendingImages.push(await fileToDataURL(f, 2.2)); } catch(err){ toast(err.message); }
+  }
+  e.target.value=''; renderMediaPreview();
+};
+$('vidInput').onchange = async e => {
+  const f = e.target.files[0];
+  if(!f) return;
+  try {
+    pendingVideos = [await fileToDataURL(f, 7)];
+    renderMediaPreview();
+  } catch(err){ toast(err.message); }
+  e.target.value='';
+};
+
+document.querySelectorAll('#stickerBar button').forEach(b => {
+  b.onclick = () => {
+    document.querySelectorAll('#stickerBar button').forEach(x => x.classList.remove('active'));
+    if(selectedSticker === b.dataset.s){ selectedSticker = null; }
+    else { selectedSticker = b.dataset.s; b.classList.add('active'); }
+  };
+});
+
+async function createPost(){
+  const text = $('postText').value.trim();
+  if(!text && !selectedSticker && !pendingImages.length && !pendingVideos.length) return toast('Напиши что-нибудь или добавь медиа');
+  try {
+    await api('/api/posts', {
+      method:'POST',
+      body: JSON.stringify({
+        text,
+        sticker: selectedSticker,
+        images: pendingImages,
+        videos: pendingVideos
+      })
+    });
+    $('postText').value = '';
+    pendingImages = []; pendingVideos = []; selectedSticker = null;
+    document.querySelectorAll('#stickerBar button').forEach(x => x.classList.remove('active'));
+    renderMediaPreview();
+    toast('Опубликовано');
+    loadFeed();
+  } catch(e){ toast(e.message); }
+}
+
+async function likePost(id){ try{ await api('/api/posts/'+id+'/like',{method:'POST'}); loadFeed(); }catch(e){toast(e.message)} }
+async function repost(id){ try{ await api('/api/posts/'+id+'/repost',{method:'POST'}); toast('Репост сделан'); loadFeed(); }catch(e){toast(e.message)} }
+async function deletePost(id){ if(!confirm('Удалить пост?'))return; try{ await api('/api/posts/'+id,{method:'DELETE'}); loadFeed(); }catch(e){toast(e.message)} }
+async function commentPost(id){ try{ const c=await api('/api/posts/'+id+'/comments'); const root=$('modalRoot'); root.innerHTML=`<div class="modal"><div class="modalbox"><h3>Комментарии</h3><div class="comment-list">${c.map(x=>`<div class="comment"><b>${esc(x.user.name)}${verifyBadge(x.user.verification)}</b><div>${esc(x.text)}</div></div>`).join('')||'<div class="muted">Пока нет комментариев</div>'}</div><textarea id="newComment" placeholder="Написать комментарий…"></textarea><div class="row"><button class="btn" onclick="sendComment(\'${id}\')">Отправить</button><button class="btn secondary" onclick="$(\'modalRoot\').innerHTML=\'\'">Закрыть</button></div></div></div>`; }catch(e){toast(e.message)} }
+async function sendComment(id){const text=$('newComment').value.trim();if(!text)return;try{await api('/api/posts/'+id+'/comments',{method:'POST',body:JSON.stringify({text})});commentPost(id);loadFeed();}catch(e){toast(e.message)}}
+async function report(type,id){ const reason=prompt('Причина жалобы:'); if(!reason)return; try{ await api('/api/reports',{method:'POST',body:JSON.stringify({targetType:type,targetId:id,reason})}); toast('Жалоба отправлена'); }catch(e){toast(e.message)} }
+
+/* ===== TikTok-style profile ===== */
+async function loadProfile(id){
+  try {
+    const u = await api('/api/users/'+id);
+    const posts = await api('/api/users/'+id+'/posts');
+    const isMe = u.id === me.id;
+    const coverStyle = u.cover
+      ? `<img src="${esc(u.cover)}" alt="">`
+      : '';
+    const actions = isMe
+      ? `<button class="btn secondary" onclick="openProfileEdit()">Изменить</button>`
+      : `<button class="btn ${u.isFollowing?'secondary':''}" onclick="toggleFollow('${u.id}',${u.isFollowing})">${u.isFollowing?'Отписаться':'Подписаться'}</button>
+         <button class="btn ghost" onclick="blockUser('${u.id}',${u.isBlocked})">${u.isBlocked?'Разблок.':'Блок'}</button>`;
+
+    $('profile').innerHTML = `
+      <div class="tt-profile">
+        <div class="tt-cover">${coverStyle}
+          ${isMe ? `<button class="tt-cover-edit" onclick="changeCover()">Обложка</button>` : ''}
+        </div>
+        <div class="tt-body">
+          <div class="tt-avatar-wrap">
+            <img class="tt-avatar" src="${esc(u.avatar)}" alt="">
+            <div class="tt-actions-top">${actions}</div>
+          </div>
+          <div class="tt-name">${esc(u.name)}</div>
+          <div class="tt-handle">@${esc(u.name.toLowerCase().replace(/\\s+/g,'_'))}</div>
+          <div class="tt-stats">
+            <div class="tt-stat"><b>${u.following||0}</b><span>Подписки</span></div>
+            <div class="tt-stat"><b>${u.followers||0}</b><span>Подписчики</span></div>
+            <div class="tt-stat"><b>${u.likes||0}</b><span>Лайки</span></div>
+          </div>
+          <div class="tt-bio">${esc(u.bio || 'Пока нет описания')}</div>
+          ${!isMe ? `<button class="btn tt-follow-btn" onclick="toggleFollow('${u.id}',${u.isFollowing})">${u.isFollowing?'Отписаться':'Подписаться'}</button>` : ''}
+        </div>
+      </div>
+      <div style="margin-top:8px">
+        ${posts.length ? posts.map(postCard).join('') : '<div class="empty">Пока нет постов</div>'}
+      </div>`;
+  } catch(e){ toast(e.message); }
+}
+
+async function toggleFollow(id, yes){
+  try {
+    await api('/api/users/'+id+'/follow', { method: yes ? 'DELETE' : 'POST' });
+    loadProfile(id);
+  } catch(e){ toast(e.message); }
+}
+async function blockUser(id, blocked){
+  try {
+    await api('/api/users/'+id+'/block', { method: blocked ? 'DELETE' : 'POST' });
+    toast(blocked ? 'Разблокировано' : 'Пользователь заблокирован');
+    loadFeed();
+  } catch(e){ toast(e.message); }
+}
+
+function openProfileEdit(){
+  const root = $('modalRoot');
+  root.innerHTML = `<div class="modal"><div class="modalbox">
+    <h3>Изменить профиль</h3>
+    <label class="muted">Имя</label>
+    <input id="editName" value="${esc(me.name)}">
+    <label class="muted">Username</label><input id="editUsername" value="${esc(me.username||'')}" placeholder="username">
+    <label class="muted">О себе</label>
+    <textarea id="editBio" rows="3">${esc(me.bio||'')}</textarea>
+    <label class="muted">Аватар</label>
+    <input type="file" id="editAvatar" accept="image/*">
+    <div style="margin:12px 0;display:flex;gap:8px">
+      <button class="btn" id="saveProfile">Сохранить</button>
+      <button class="btn secondary" onclick="$('modalRoot').innerHTML=''">Отмена</button>
+    </div>
+  </div></div>`;
+  $('saveProfile').onclick = async () => {
+    try {
+      const body = { name: $('editName').value.trim(), username: $('editUsername').value.trim().replace(/^@/,''), bio: $('editBio').value };
+      const f = $('editAvatar').files[0];
+      if(f) body.avatar = await fileToDataURL(f, 2.5);
+      me = await api('/api/me', { method:'PATCH', body: JSON.stringify(body) });
+      toast('Профиль сохранён');
+      root.innerHTML = '';
+      loadProfile(me.id);
+    } catch(e){ toast(e.message); }
+  };
+}
+
+async function changeCover(){
+  const input = document.createElement('input');
+  input.type = 'file'; input.accept = 'image/*';
+  input.onchange = async () => {
+    const f = input.files[0];
+    if(!f) return;
+    try {
+      const cover = await fileToDataURL(f, 2.5);
+      me = await api('/api/me', { method:'PATCH', body: JSON.stringify({ cover }) });
+      toast('Обложка обновлена');
+      loadProfile(me.id);
+    } catch(e){ toast(e.message); }
+  };
+  input.click();
+}
+
+async function loadCommunities(){
+  try{const list=await api('/api/communities');$('communities').innerHTML=list.map(c=>`<div class="card community-card"><div class="row"><div class="grow"><b>${esc(c.name)}</b><div class="muted">${esc(c.description||'')} · ${c.members} участников</div></div><button class="btn ${c.joined?'secondary':''}" onclick="toggleCommunity('${c.id}',${c.joined})">${c.joined?'Выйти':'Вступить'}</button></div></div>`).join('')||'<div class="empty">Сообществ пока нет.</div>'}catch(e){toast(e.message)}}
+async function toggleCommunity(id,joined){try{await api('/api/communities/'+id+'/join',{method:joined?'DELETE':'POST'});loadCommunities()}catch(e){toast(e.message)}}
+async function createCommunity(){const name=prompt('Название сообщества:');if(!name)return;const description=prompt('Описание:')||'';try{await api('/api/communities',{method:'POST',body:JSON.stringify({name,description})});loadCommunities()}catch(e){toast(e.message)}}
+function openStickerEditor(){const root=$('modalRoot');const stickers=['🔥','😂','❤️','👀','💀','✨','🐸','💯','🚀','👑','😎','🤡','🥶','💜','🦊','🐉','⭐','🎯','🍕','🫶'];root.innerHTML=`<div class="modal"><div class="modalbox"><h3>Редактор стикеров</h3><p class="muted">Выбери стикер, добавь свой символ и сохрани.</p><div class="sticker-editor-grid">${stickers.map(x=>`<button class="sticker-pick" onclick="selectCustomSticker('${x}')">${x}</button>`).join('')}</div><input id="customSticker" maxlength="8" placeholder="Свой стикер / эмодзи"><div class="row"><button class="btn" onclick="saveSticker()">Сохранить</button><button class="btn secondary" onclick="$('modalRoot').innerHTML=''">Закрыть</button></div></div></div>`}
+function selectCustomSticker(x){$('customSticker').value=x}
+async function saveSticker(){const s=$('customSticker').value.trim();if(!s)return;try{await api('/api/me/stickers',{method:'POST',body:JSON.stringify({sticker:s})});toast('Стикер сохранён');$('modalRoot').innerHTML='';loadMe();renderStickerBar()}catch(e){toast(e.message)}}
+function renderStickerBar(){const list=[...new Set([...(me?.stickers||[]),'🔥','😂','❤️','👀','💀','✨','🐸','💯','🚀','👑'])];$('stickerBar').innerHTML=list.map(x=>`<button data-s="${esc(x)}">${esc(x)}</button>`).join('');document.querySelectorAll('#stickerBar button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#stickerBar button').forEach(x=>x.classList.remove('active'));if(selectedSticker===b.dataset.s)selectedSticker=null;else{selectedSticker=b.dataset.s;b.classList.add('active')}})}
+function openThemeSettings(){const root=$('modalRoot');const colors=['#1687e8','#e53935','#8e44ad','#16a085','#f39c12','#111827','#e91e63','#00a8ff'];root.innerHTML=`<div class="modal"><div class="modalbox"><h3>Тема и цвета</h3><div class="row"><button class="btn secondary" onclick="setTheme('light')">☀️ Светлая</button><button class="btn secondary" onclick="setTheme('dark')">🌙 Тёмная</button></div><p class="muted">Цвет интерфейса</p><div class="color-row">${colors.map(c=>`<button class="color-dot" style="background:${c}" onclick="setAccent('${c}')"></button>`).join('')}</div><input id="customColor" type="color" value="${localStorage.getItem('lb8-accent')||'#1687e8'}"><button class="btn" onclick="setAccent($('customColor').value)">Выбрать свой</button><button class="btn secondary" onclick="$('modalRoot').innerHTML=''">Закрыть</button></div></div>`}
+function setTheme(t){document.body.dataset.theme=t;localStorage.setItem('lb8-theme',t);applyTheme()}
+function setAccent(c){localStorage.setItem('lb8-accent',c);applyTheme()}
+function applyTheme(){const dark=localStorage.getItem('lb8-theme')==='dark';const c=localStorage.getItem('lb8-accent')||'#1687e8';document.documentElement.style.setProperty('--blue',c);document.documentElement.style.setProperty('--soft',dark?'#1b2636':c+'18');document.documentElement.style.setProperty('--bg',dark?'#0b1117':'#f4f7fb');document.documentElement.style.setProperty('--card',dark?'#121a23':'#fff');document.documentElement.style.setProperty('--text',dark?'#f2f5f8':'#17202a');document.documentElement.style.setProperty('--muted',dark?'#9aa7b5':'#738091');document.documentElement.style.setProperty('--line',dark?'#263241':'#e4e9ef');document.documentElement.style.setProperty('--accent',c)}
+function openSupport(){const root=$('modalRoot');root.innerHTML=`<div class="modal"><div class="modalbox"><h3>Центр поддержки</h3><p class="muted">Здесь можно запросить подтверждение личности.</p><select id="verifyType" style="width:100%;padding:11px;border:1px solid var(--line);border-radius:11px;margin-bottom:10px"><option value="red">🔴 Красная — настоящий Арут</option><option value="blue">🔵 Синяя — настоящий хэлодэнил</option></select><textarea id="verifyReason" placeholder="Почему аккаунт нужно подтвердить?"></textarea><div class="row"><button class="btn" onclick="requestVerification()">Отправить заявку</button><button class="btn secondary" onclick="$('modalRoot').innerHTML=''">Закрыть</button></div></div></div>`}
+async function requestVerification(){try{await api('/api/verification-requests',{method:'POST',body:JSON.stringify({type:$('verifyType').value,reason:$('verifyReason').value})});toast('Заявка отправлена в поддержку');$('modalRoot').innerHTML=''}catch(e){toast(e.message)}}
+async function loadDict(){
+  try {
+    const d = await api('/api/dictionary');
+    $('dict').innerHTML = d.map(x=>`<div class="card"><b>${esc(x.word)}</b><div class="muted">${esc(x.note||'')}</div></div>`).join('') || '<div class="empty">Слов пока нет.</div>';
+    if(d[0]){ $('wordDay').textContent = d[0].word; $('wordNote').textContent = d[0].note || ''; }
+  } catch(e){ toast(e.message); }
+}
+async function suggest(){
+  const word = prompt('Новое слово:'); if(!word) return;
+  const note = prompt('Значение / пояснение:') || '';
+  try { await api('/api/dictionary/suggest',{method:'POST',body:JSON.stringify({word,note})}); toast('Отправлено на модерацию'); }
+  catch(e){ toast(e.message); }
+}
+async function loadNotifications(){
+  try {
+    const n = await api('/api/notifications');
+    $('notifications').innerHTML = n.length
+      ? n.map(x=>`<div class="card">${esc(x.type==='follow'?'Новая подписка':x.type==='like'?'Ваш пост понравился':'Новая активность')}<div class="muted">${new Date(x.createdAt).toLocaleString()}</div></div>`).join('')
+      : '<div class="empty">Уведомлений нет.</div>';
+    await api('/api/notifications/read',{method:'POST'});
+  } catch(e){ toast(e.message); }
+}
+async function loadAdmin(){
+  if(me.role !== 'admin'){ $('adminPanel').innerHTML = ''; return; }
+  try {
+    const [reports, dict, ver] = await Promise.all([api('/api/admin/reports'), api('/api/admin/dictionary'), api('/api/admin/verification-requests')]);
+    $('adminPanel').innerHTML = `<div class="card admin"><h3>Админка</h3>
+      <b>Жалобы</b>${reports.slice(0,30).map(r=>`<div class="list-item"><div class="grow"><b>${esc(r.targetType)}: ${esc(r.targetId)}</b><div>${esc(r.reason)}</div><small>${r.status}</small></div><button class="btn secondary" onclick="resolveReport('${r.id}')">✓</button></div>`).join('')||'<p class="muted">Нет жалоб</p>'}
+      <hr><b>Заявки на галочки</b>${ver.filter(x=>x.status==='pending').map(r=>`<div class="list-item"><div class="grow"><b>${esc(r.user.name)} ${verifyBadge(r.type)}</b><div>${esc(r.reason||'Без пояснения')}</div></div><button class="btn" onclick="verificationModerate('${r.id}','approved')">Подтвердить</button><button class="btn danger" onclick="verificationModerate('${r.id}','rejected')">Отклонить</button></div>`).join('')||'<p class="muted">Нет заявок</p>'}<hr><b>Предложения слов</b>${dict.filter(x=>x.status==='pending').map(d=>`<div class="list-item"><div class="grow"><b>${esc(d.word)}</b><div>${esc(d.note||'')}</div></div>
+        <button class="btn" onclick="dictModerate('${d.id}','confirmed')">Принять</button>
+        <button class="btn danger" onclick="dictModerate('${d.id}','rejected')">Отклонить</button></div>`).join('')||'<p class="muted">Нет предложений</p>'}
+    </div>`;
+  } catch(e){ toast(e.message); }
+}
+async function resolveReport(id){ try{ await api('/api/admin/reports/'+id,{method:'PATCH',body:JSON.stringify({status:'resolved'})}); loadAdmin(); }catch(e){toast(e.message)} }
+async function verificationModerate(id,status){try{await api('/api/admin/verification-requests/'+id,{method:'PATCH',body:JSON.stringify({status})});loadAdmin();}catch(e){toast(e.message)}}
+async function dictModerate(id,status){ try{ await api('/api/admin/dictionary/'+id,{method:'PATCH',body:JSON.stringify({status})}); loadAdmin(); loadDict(); }catch(e){toast(e.message)} }
+
+async function tryServer(value){
+  value = normalizeServerUrl(value); if(!value) return false;
+  try {
+    const r = await fetch(value+'/api/health',{cache:'no-store',signal:AbortSignal.timeout(2200)});
+    const d = await r.json();
+    if(!r.ok || !d.ok) return false;
+    API_BASE = value;
+    localStorage.setItem('lb7-server', API_BASE);
+    localStorage.setItem('lb6-server', API_BASE);
+    return true;
+  } catch { return false; }
+}
+async function autoConnect(){
+  $('serverErr').textContent = 'Ищу сервер…';
+  for(const value of AUTO_SERVERS){
+    if(await tryServer(value)){ $('serverConnect').classList.add('hidden'); toast('Сервер подключён'); return true; }
+  }
+  $('serverErr').textContent = 'Автопоиск не удался. Укажи адрес вручную.';
+  return false;
+}
+async function checkServer(){
+  const value = normalizeServerUrl($('serverUrl').value);
+  if(!value){ $('serverErr').textContent = 'Укажи адрес сервера'; return false; }
+  $('serverErr').textContent = 'Проверяю…';
+  if(await tryServer(value)){ $('serverConnect').classList.add('hidden'); $('serverErr').textContent=''; toast('Сервер подключён'); return true; }
+  $('serverErr').textContent = 'Сервер не найден.';
+  return false;
+}
+function setupServerConnection(){
+  if(initialServer) $('serverUrl').value = initialServer;
+  else if(savedServer) $('serverUrl').value = savedServer;
+  $('serverConnectGo').onclick = checkServer;
+  $('serverAuto').onclick = autoConnect;
+  if(API_BASE) return true;
+  $('serverConnect').classList.remove('hidden');
+  return false;
+}
+
+function authUI(){
+  $('tabLogin').onclick = () => { authMode='login'; $('tabLogin').classList.add('active'); $('tabReg').classList.remove('active'); $('authGo').textContent='Войти'; };
+  $('tabReg').onclick = () => { authMode='register'; $('tabReg').classList.add('active'); $('tabLogin').classList.remove('active'); $('authGo').textContent='Создать аккаунт'; };
+  $('authGo').onclick = async () => {
+    try {
+      const d = await api('/api/auth/'+authMode, { method:'POST', body: JSON.stringify({ name:$('authName').value, password:$('authPass').value }) });
+      token = d.token;
+      localStorage.setItem('lb7-token', token);
+      localStorage.setItem('lb6-token', token);
+      await loadMe();
+      renderStickerBar();
+      nav('feed');
+      loadDict();
+    } catch(e){ $('authErr').textContent = e.message; }
+  };
+}
+
+for(const b of document.querySelectorAll('[data-v]')) b.onclick = () => nav(b.dataset.v);
+for(const b of document.querySelectorAll('[data-feed]')) b.onclick = () => {
+  document.querySelectorAll('[data-feed]').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  feedType = b.dataset.feed;
+  loadFeed();
+};
+$('postGo').onclick = createPost;
+$('mobileCreate').onclick = () => { $('postText').focus(); nav('feed'); };
+$('suggestBtn').onclick = suggest;
+$('editProfile').onclick = openProfileEdit;
+$('logout').onclick = () => { localStorage.removeItem('lb7-token'); localStorage.removeItem('lb6-token'); location.reload(); };
+authUI(); applyTheme();
+
+async function startApp(){
+  const connected = await setupServerConnection();
+  if(!connected){
+    const ok = await autoConnect();
+    if(!ok) return;
+  }
+  if(token){
+    try { await loadMe(); renderStickerBar(); nav('feed'); loadDict(); }
+    catch(e){ localStorage.removeItem('lb6-token'); token=null; $('authErr').textContent=e.message; $('auth').classList.remove('hidden'); }
+  } else $('auth').classList.remove('hidden');
+}
+startApp();
+</script>
+</body>
+</html>
